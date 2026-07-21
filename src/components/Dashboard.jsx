@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth';
 import DocumentForm from './DocumentForm';
 import KanbanBoard from './KanbanBoard';
 import CalendarView from './CalendarView';
+import TaskView from './TaskView';
 import Reports from './Reports';
 
 export default function Dashboard() {
@@ -156,6 +157,12 @@ export default function Dashboard() {
                 }`}>
                 Kanban
               </button>
+              <button onClick={() => setView('tasks')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  view === 'tasks' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'
+                }`}>
+                បញ្ជី
+              </button>
               <button onClick={() => setView('calendar')}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                   view === 'calendar' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'
@@ -194,6 +201,14 @@ export default function Dashboard() {
           <CalendarView
             documents={filteredDocs}
             onEdit={handleEdit}
+            search={search}
+            onSearchChange={setSearch}
+          />
+        ) : view === 'tasks' ? (
+          <TaskView
+            documents={filteredDocs}
+            onEdit={handleEdit}
+            onRefresh={() => {}}
             search={search}
             onSearchChange={setSearch}
           />
