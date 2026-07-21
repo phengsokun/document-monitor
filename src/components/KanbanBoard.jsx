@@ -150,7 +150,7 @@ export default function KanbanBoard({ documents, onRefresh, onEdit, search, onSe
     e.preventDefault();
     setDragOverCol(null);
     setDraggedDocId(null);
-    const docId = Number(e.dataTransfer.getData('text/plain'));
+    const docId = e.dataTransfer.getData('text/plain');
     if (!docId) return;
     const updates = { status: colKey };
     const now = new Date().toISOString();

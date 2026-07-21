@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { getAllDocuments, updateDocument, deleteDocument, exportToJSON, importFromJSON } from '../lib/db';
 import { checkOverdue, getStatus } from '../lib/dueDateCheck';
 import { configureEmail, getEmailConfig, sendOverdueAlerts } from '../lib/emailAlert';
+import { useAuth } from '../lib/auth';
 import DocumentForm from './DocumentForm';
 import KanbanBoard from './KanbanBoard';
 import Reports from './Reports';
 
 export default function Dashboard() {
+  const { logout, user } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [view, setView] = useState('board');
   const [editDoc, setEditDoc] = useState(null);
@@ -157,6 +159,10 @@ export default function Dashboard() {
             <button onClick={() => setShowEmailSettings(true)}
               className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm">
               អ៊ីមែល
+            </button>
+            <button onClick={logout}
+              className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
+              ចាកចេញ
             </button>
           </div>
         </div>
