@@ -11,6 +11,7 @@ import {
   orderBy,
   where,
   serverTimestamp,
+  onSnapshot,
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
@@ -72,6 +73,18 @@ export async function getAllDocuments() {
   const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data(), photoBlob: d.data().photoUrl }));
+}
+
+export function listenToDocuments(callback) {
+  const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => {
+    const docs = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+      photoBlob: d.data().photoUrl,
+    }));
+    callback(docs);
+  });
 }
 
 export async function getDocumentsByStatus(status) {

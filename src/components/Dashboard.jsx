@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getAllDocuments, updateDocument, deleteDocument, exportToJSON, importFromJSON } from '../lib/db';
+import { useState, useEffect } from 'react';
+import { getAllDocuments, listenToDocuments, updateDocument, deleteDocument, exportToJSON, importFromJSON } from '../lib/db';
 import { checkOverdue, getStatus } from '../lib/dueDateCheck';
 import { configureEmail, getEmailConfig, sendOverdueAlerts } from '../lib/emailAlert';
 import { useAuth } from '../lib/auth';
@@ -19,36 +19,34 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [showReports, setShowReports] = useState(false);
 
-  const loadDocs = useCallback(async () => {
-    const docs = await getAllDocuments();
-    setDocuments(docs);
-    setLoading(false);
-  }, []);
-
   useEffect(() => {
-    loadDocs();
-  }, [loadDocs]);
+    const unsub = listenToDocuments((docs) => {
+      setDocuments(docs);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     checkOverdue().then((count) => {
       if (count > 0) {
         setNotification({ type: 'warning', text: `${count} ឯកសារផុតកំណត់!` });
-        loadDocs();
       }
     });
 
     const interval = setInterval(() => {
       checkOverdue().then((count) => {
-        if (count > 0) loadDocs();
-        getAllDocuments().then((docs) => {
-          const overdue = docs.filter((d) => getStatus(d) === 'overdue');
-          if (overdue.length > 0) sendOverdueAlerts(overdue);
-        });
+        if (count > 0) {
+          getAllDocuments().then((docs) => {
+            const overdue = docs.filter((d) => getStatus(d) === 'overdue');
+            if (overdue.length > 0) sendOverdueAlerts(overdue);
+          });
+        }
       });
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [loadDocs]);
+  }, []);
 
   const handleEdit = (doc) => {
     setEditDoc(doc);
@@ -58,7 +56,6 @@ export default function Dashboard() {
   const handleSaved = () => {
     setEditDoc(null);
     setView('board');
-    loadDocs();
   };
 
   const handleExport = async () => {
@@ -81,7 +78,6 @@ export default function Dashboard() {
       if (!file) return;
       const text = await file.text();
       await importFromJSON(text);
-      loadDocs();
       setNotification({ type: 'success', text: 'នាំចូលរួចរាល់!' });
     };
     input.click();
