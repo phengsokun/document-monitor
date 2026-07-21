@@ -5,6 +5,7 @@ import { configureEmail, getEmailConfig, sendOverdueAlerts } from '../lib/emailA
 import { useAuth } from '../lib/auth';
 import DocumentForm from './DocumentForm';
 import KanbanBoard from './KanbanBoard';
+import CalendarView from './CalendarView';
 import Reports from './Reports';
 
 export default function Dashboard() {
@@ -148,6 +149,20 @@ export default function Dashboard() {
               className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm">
               នាំចូល
             </button>
+            <div className="flex bg-gray-100 rounded-lg p-0.5">
+              <button onClick={() => setView('board')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  view === 'board' || view === 'form' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'
+                }`}>
+                Kanban
+              </button>
+              <button onClick={() => setView('calendar')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  view === 'calendar' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'
+                }`}>
+                ប្រតិទិន
+              </button>
+            </div>
             <button onClick={() => setShowReports(true)}
               className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm">
               របាយការណ៍
@@ -175,6 +190,13 @@ export default function Dashboard() {
             </button>
             <DocumentForm editDoc={editDoc} onSaved={handleSaved} onCancel={() => { setEditDoc(null); setView('board'); }} />
           </div>
+        ) : view === 'calendar' ? (
+          <CalendarView
+            documents={filteredDocs}
+            onEdit={handleEdit}
+            search={search}
+            onSearchChange={setSearch}
+          />
         ) : (
           <KanbanBoard
             documents={filteredDocs}
