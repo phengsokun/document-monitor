@@ -178,7 +178,7 @@ export default function Dashboard() {
         ) : (
           <KanbanBoard
             documents={filteredDocs}
-            onRefresh={loadDocs}
+            onRefresh={() => {}}
             onEdit={handleEdit}
             search={search}
             onSearchChange={setSearch}
